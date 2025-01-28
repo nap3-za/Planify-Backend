@@ -7,7 +7,7 @@ from core.apps.misc.field_choices import (
 )
 
 
-class ClientProfileQuerySet(models.QuerySet):
+class ClientQuerySet(models.QuerySet):
 	
 	def search(self, query=None):
 		if query == None:
@@ -15,9 +15,9 @@ class ClientProfileQuerySet(models.QuerySet):
 		lookups += Q(Q(name__icontains=query))
 		return self.filter(lookups)
 
-class ClientProfile(models.Model):
+class Client(models.Model):
 	
-	class ClientProfileManager(models.Manager):
+	class ClientManager(models.Manager):
 
 		def create(self, 
 				name,
@@ -39,7 +39,7 @@ class ClientProfile(models.Model):
 			return model
 
 		def get_queryset(self):
-			return ClientProfileQuerySet(self.model, using=self._db)
+			return ClientQuerySet(self.model, using=self._db)
 
 		def search(self, query=None):
 			return self.get_queryset().search(query=query)
@@ -56,7 +56,7 @@ class ClientProfile(models.Model):
 
 	timestamp					= models.DateTimeField(auto_now_add=True)
 
-	objects = ClientProfileManager()
+	objects = ClientManager()
 
 
 	def __str__(self):
@@ -64,5 +64,5 @@ class ClientProfile(models.Model):
 
 
 	def update(self, **kwargs):
-		ClientProfile.objects.filter(id=self.id).update(**kwargs)
-		return ClientProfile.objects.get(id=self.id)
+		Client.objects.filter(id=self.id).update(**kwargs)
+		return Client.objects.get(id=self.id)

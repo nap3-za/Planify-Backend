@@ -71,7 +71,7 @@ class Event(models.Model):
 		null=True,
 	)
 	client 								= models.ForeignKey(
-		"client.ClientProfile",
+		"client.Client",
 		related_name="events",
 		related_query_name="event",
 		on_delete=models.SET_NULL,

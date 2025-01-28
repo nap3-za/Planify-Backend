@@ -15,6 +15,8 @@ urlpatterns = [
     path('authentication/account/', account_views.RetrieveAuthenticatedAccount.as_view(), name="retrieve-account"),
 
     path('account/', include('core.apps.account.urls', namespace="account")),
+    path('', include('core.apps.event.urls', namespace="event")),
+    path('client/', include('core.apps.client.urls', namespace="client")),
 
     # Password related views using 3rd party app
     # re_path(r'^password-reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,32})/$',
