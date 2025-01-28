@@ -33,7 +33,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
 		def search(self, query=None):
 			return self.get_queryset().search(query=query)
 
-		def create_user(self,username,name,surname,gender,accept,email=None,phone_number=None,password=None):
+		def create_user(self,username,name,surname,gender,accept,email,phone_number=None,password=None):
 			user = self.model(
 				username=username,
 				name=name,
@@ -48,7 +48,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
 			
 			return user
 
-		def create_superuser(self,username,name,surname,gender,accept,email,phone_number,password):
+		def create_superuser(self,username,name,surname,gender,accept,email,password, phone_number=None):
 			user = self.create_user(
 				username=username,
 				name=name,
