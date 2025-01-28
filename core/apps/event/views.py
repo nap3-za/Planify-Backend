@@ -38,14 +38,16 @@ class EventViewSet(viewsets.ModelViewSet):
 		serializer = None
 		paginate = True
 
-		if request.GET and request.data:
-			q = request.data
+		if request.GET:
+			q = request.GET.dict()
 
-			if q["filters"]:
-				queryset = queryset.filter(**q["filters"])
+			if "filter" in q:
+				del q["filter"]
+				queryset = queryset.filter(**q)
 
-			elif q["single"]:
-				queryset = queryset.objects.get(**q["single"])
+			elif "single" in q:
+				del q["single"]
+				queryset = queryset.filter(**q)[0]
 				paginate = False
 
 		if paginate:
@@ -72,4 +74,37 @@ class TaskViewSet(viewsets.ModelViewSet):
 	queryset = Task.objects.all()
 	serializer_class = TaskSerializer
 	pagination_class = TaskViewSetPagination
+
+
+	def list(self, request, *args, **kwargs):
+		queryset = self.filter_queryset(self.get_queryset())
+		queryset = queryset.filter(event__coordinator=request.user)
+
+		#  - - -
+		serializer = None
+		paginate = True
+
+		if request.GET:
+			q = request.GET.dict()
+
+			if "filter" in q:
+				del q["filter"]
+				queryset = queryset.filter(**q)
+
+			elif "single" in q:
+				del q["single"]
+				queryset = queryset.filter(**q)[0]
+				paginate = False
+
+		if paginate:
+			page = self.paginate_queryset(queryset)
+			if page is not None:
+				serializer = self.get_serializer(page, many=True)
+				return self.get_paginated_response(serializer.data)
+			serializer = self.get_serializer(queryset, many=True)
+		else:
+			serializer = self.get_serializer(queryset, context=self.get_serializer_context())
+
+
+		return Response(serializer.data)
 

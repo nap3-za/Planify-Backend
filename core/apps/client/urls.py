@@ -11,5 +11,5 @@ urlpatterns = [
 
 
 client_router = DefaultRouter()
-client_router.register("client", views.ClientViewSet, basename="client")
+client_router.register("", views.ClientViewSet, basename="client")
 urlpatterns += client_router.urls

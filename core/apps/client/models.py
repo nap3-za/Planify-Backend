@@ -44,7 +44,6 @@ class Client(models.Model):
 		def search(self, query=None):
 			return self.get_queryset().search(query=query)
 
-
 	name  						= models.CharField(verbose_name="name", max_length=125, blank=False) 
 	code  						= models.CharField(verbose_name="code", max_length=5, blank=False) 
 	details 					= models.TextField(blank=True)

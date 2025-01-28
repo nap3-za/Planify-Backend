@@ -19,7 +19,7 @@ class ClientSerializer(serializers.ModelSerializer):
 			"details",
 			"rank",
 			"status",
-			"relational_timestamp",
+			"relation_timestamp",
 
 			# Display
 			"rank_display",
