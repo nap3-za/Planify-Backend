@@ -52,6 +52,9 @@ INSTALLED_APPS = [
     'core.apps.misc',
     'core.apps.account',
 
+    'core.apps.event',
+    'core.apps.client',
+
     # Required third-party Applications
     'rest_framework',
     'rest_framework.authtoken',
