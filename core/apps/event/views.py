@@ -15,6 +15,7 @@ from .serializers import (
 	TaskSerializer,
 
 	EventSummarySerializer,
+	TaskSummarySerializer,
 )
 from .models import (
 	Event,
@@ -85,11 +86,15 @@ class TaskViewSet(viewsets.ModelViewSet):
 		queryset = queryset.filter(event__coordinator=request.user)
 
 		#  - - -
-		serializer = None
+		serializer = self.serializer_class
 		paginate = True
 
 		if request.GET:
 			q = request.GET.dict()
+
+			if "summary" in q:
+				del q["summary"]
+				serializer = TaskSummarySerializer
 
 			if "filter" in q:
 				del q["filter"]
@@ -103,18 +108,14 @@ class TaskViewSet(viewsets.ModelViewSet):
 		if paginate:
 			page = self.paginate_queryset(queryset)
 			if page is not None:
-				serializer = self.get_serializer(page, many=True)
+				serializer = serializer(page, many=True)
 				return self.get_paginated_response(serializer.data)
-			serializer = self.get_serializer(queryset, many=True)
+			serializer = serializer(queryset, many=True)
 		else:
-			serializer = self.get_serializer(queryset, context=self.get_serializer_context())
+			serializer = serializer(queryset)
 
 
 		return Response(serializer.data)
-
-
-
-
 
 
 class DashboardView(generics.GenericAPIView):

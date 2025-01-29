@@ -120,3 +120,27 @@ class TaskSerializer(serializers.ModelSerializer):
 	def update(self, instance, validated_data):
 		instance = instance.update(**validated_data)
 		return instance
+
+class TaskSummarySerializer(serializers.ModelSerializer):
+	priority_display 					= serializers.CharField(source="get_priority_display", read_only=True)
+	status_display 					= serializers.CharField(source="get_status_display", read_only=True)
+	
+	class Meta:
+		model = Task
+		fields = (
+			"id",
+			"details",
+			"due_date",
+
+			# Display
+			"priority_display",
+			"status_display",
+		)
+
+		read_only_fields = (
+			"id",
+			"priority_display",
+			"status_display",
+		)
+
+
