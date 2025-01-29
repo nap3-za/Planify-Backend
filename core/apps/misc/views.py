@@ -8,7 +8,7 @@ from rest_framework import (
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import (
+from core.apps.event.serializers import (
 	EventSerializer,
 	EventSummarySerializer,
 )
@@ -24,7 +24,7 @@ from core.apps.misc.field_choices import (
 class DashboardView(generics.GenericAPIView):
 
 	def get(self, request, *args, **kwargs):
-		queryset = Event.objects.filter(event__coordinator=request.user).distinct()
+		queryset = Event.objects.filter(coordinator=request.user).distinct()
 		response_data = {
 			"stats": None,
 			"events": None,
@@ -32,19 +32,19 @@ class DashboardView(generics.GenericAPIView):
 
 		# Set of 5 events by rank
 		events_list = EventSummarySerializer(queryset.all()[:10], many=True).data
-		events_by_rank = {}
+		events_by_event_status = {}
 
-		for i, status in enumerate(EventStatuses.choices):
-			events_by_status[f"type_{i+1}"] = {
-				"type": status[1],
+		for i, event_status in enumerate(EventStatuses.choices):
+			events_by_event_status[f"type_{i+1}"] = {
+				"type": event_status[1],
 				"data": EventSummarySerializer(
 					queryset.filter(
-						status=status[0]
-					).order_by("-name")[:5],
+						status=event_status[0]
+					).order_by("-title")[:5],
 					many=True
 				).data
 			}
-			events_by_rank[f"type_{i+1}"]["stats"] = {
+			events_by_event_status[f"type_{i+1}"]["stats"] = {
 				"Stat 1": 80,
 				"Stat 2": 80,
 				"Stat 3": 80,
@@ -60,7 +60,7 @@ class DashboardView(generics.GenericAPIView):
 		} 
 		response_data["events"] = {
 			"all": events_list,
-			**events_by_rank,
+			**events_by_event_status,
 		}
 
 		response_data["event"] = {

@@ -15,6 +15,7 @@ urlpatterns = [
     path('authentication/account/', account_views.RetrieveAuthenticatedAccount.as_view(), name="retrieve-account"),
 
     path('account/', include('core.apps.account.urls', namespace="account")),
+    path('', include('core.apps.misc.urls', namespace="misc")),
     path('', include('core.apps.event.urls', namespace="event")),
     path('clients/', include('core.apps.client.urls', namespace="client")),
 

@@ -64,10 +64,6 @@ class EventSummarySerializer(serializers.ModelSerializer):
 			"id",
 			"title",
 			"code",
-			"priority",
-			"event_type",
-			"status",
-			"bill_status",
 			"date_time",
 			"duration",
 
