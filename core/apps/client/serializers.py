@@ -35,3 +35,28 @@ class ClientSerializer(serializers.ModelSerializer):
 	def update(self, instance, validated_data):
 		instance = instance.update(**validated_data)
 		return instance
+
+
+class ClientSummarySerializer(serializers.ModelSerializer):
+	rank_display 					= serializers.CharField(source="get_rank_display", read_only=True)
+	status_display 					= serializers.CharField(source="get_status_display", read_only=True)
+	
+	class Meta:
+		model = Client
+		fields = (
+			"id",
+			"name",
+			"code",
+			"rank",
+			"status",
+
+			# Display
+			"rank_display",
+			"status_display",
+		)
+
+		read_only_fields = (
+			"id",
+			"rank_display",
+			"status_display",
+		)

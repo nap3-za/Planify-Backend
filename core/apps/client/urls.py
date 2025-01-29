@@ -7,6 +7,7 @@ app_name="client"
 
 
 urlpatterns = [
+	path("clients/dashboard-data/", views.DashboardView.as_view(), name="dashboard-data"),
 ]
 
 

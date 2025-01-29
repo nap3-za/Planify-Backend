@@ -10,9 +10,13 @@ from rest_framework.views import APIView
 
 from .serializers import (
 	ClientSerializer,
+	ClientSummarySerializer,
 )
 from .models import (
 	Client,
+)
+from core.apps.misc.field_choices import (
+	ClientRanks,
 )
 
 
@@ -29,7 +33,7 @@ class ClientViewSet(viewsets.ModelViewSet):
 
 	def list(self, request, *args, **kwargs):
 		queryset = self.filter_queryset(self.get_queryset())
-		queryset = queryset.filter(event__coordinator=request.user).distinct()
+		queryset = queryset.filter(client__coordinator=request.user).distinct()
 
 		#  - - -
 		serializer = None
@@ -61,4 +65,48 @@ class ClientViewSet(viewsets.ModelViewSet):
 
 
 
+class DashboardView(generics.GenericAPIView):
+
+	def get(self, request, *args, **kwargs):
+		queryset = Client.objects.filter(client__coordinator=request.user).distinct()
+		response_data = {
+			"stats": None,
+			"clients": None,
+		}
+
+		# Set of 5 clients by rank
+		clients_list = ClientSummarySerializer(queryset.all()[:10], many=True).data
+		clients_by_rank = {}
+
+		for i, rank in enumerate(ClientRanks.choices):
+			clients_by_rank[f"type_{i+1}"] = {
+				"type": rank[1],
+				"data": ClientSummarySerializer(
+					queryset.filter(
+						rank=rank[0]
+					).order_by("-name")[:5],
+					many=True
+				).data
+			}
+			clients_by_rank[f"type_{i+1}"]["stats"] = {
+				"Stat 1": 80,
+				"Stat 2": 80,
+				"Stat 3": 80,
+				"Stat 4": 80,
+			}
+
+
+		response_data["stats"] = {
+			"Stat 1": 80,
+			"Stat 2": 80,
+			"Stat 3": 80,
+			"Stat 4": 80,
+		} 
+		response_data["clients"] = {
+			"all": clients_list,
+			**clients_by_rank,
+		}
+
+
+		return Response(response_data, status=status.HTTP_200_OK)
 

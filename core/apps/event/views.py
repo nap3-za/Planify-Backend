@@ -1,3 +1,5 @@
+from datetime import datetime,timedelta
+
 from rest_framework import (
 	generics,
 	status,
@@ -11,11 +13,14 @@ from rest_framework.views import APIView
 from .serializers import (
 	EventSerializer,
 	TaskSerializer,
+
+	EventSummarySerializer,
 )
 from .models import (
 	Event,
 	Task,
 )
+
 
 
 class EventViewSetPagination(pagination.PageNumberPagination):
@@ -63,7 +68,6 @@ class EventViewSet(viewsets.ModelViewSet):
 		return Response(serializer.data)
 
 
-
 class TaskViewSetPagination(pagination.PageNumberPagination):
 	page_size = 5
 	page_size_query_param = "size"
@@ -107,4 +111,73 @@ class TaskViewSet(viewsets.ModelViewSet):
 
 
 		return Response(serializer.data)
+
+
+
+
+
+
+class DashboardView(generics.GenericAPIView):
+
+	def get(self, request, *args, **kwargs):
+		queryset = Event.objects.filter(coordinator=request.user)
+		response_data = {
+			"stats": None,
+			"events": None,
+		}
+
+		# Set of 5 events for next 3 months
+		now = datetime.now()
+		events_list = EventSummarySerializer(queryset.all()[:10], many=True).data
+		events_by_month = {}
+
+		start_date = [now.year, now.month]
+		for i in range(3):
+			end_date = [start_date[0], start_date[1] + 1]
+
+
+			if start_date[1] == 13:
+				start_date[0] = start_date[0] + 1
+				start_date[1] = 1
+
+				end_date[0] = start_date[0] + 1
+				end_date[1] = 1
+
+
+			month_start = datetime(start_date[0], start_date[1], 1)
+			month_end = datetime(end_date[0], end_date[1], 1) if now.month - i+1 <= 12 else now
+			month_str = month_start.strftime("%B")
+
+			events_by_month[f"type_{i+1}"] = {
+				"type": month_str,
+				"data": EventSummarySerializer(
+					queryset.filter(
+						date_time__gte=month_start,
+						date_time__lt=month_end
+					).order_by("-date_time")[:5],
+					many=True
+				).data
+			}
+			events_by_month[f"type_{i+1}"]["stats"] = {
+				"Stat 1": 80,
+				"Stat 2": 80,
+				"Stat 3": 80,
+				"Stat 4": 80,
+			}
+			start_date[1] = start_date[1] + 1
+
+
+		response_data["stats"] = {
+			"Stat 1": 80,
+			"Stat 2": 80,
+			"Stat 3": 80,
+			"Stat 4": 80,
+		} 
+		response_data["events"] = {
+			"all": events_list,
+			**events_by_month,
+		}
+
+
+		return Response(response_data, status=status.HTTP_200_OK)
 

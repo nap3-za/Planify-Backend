@@ -7,6 +7,7 @@ app_name="event"
 
 
 urlpatterns = [
+	path("events/dashboard-data/", views.DashboardView.as_view(), name="dashboard-data"),
 ]
 
 
