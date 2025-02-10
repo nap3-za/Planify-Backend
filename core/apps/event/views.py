@@ -25,9 +25,9 @@ from .models import (
 
 
 class EventViewSetPagination(pagination.PageNumberPagination):
-	page_size = 5
+	page_size = 25
 	page_size_query_param = "size"
-	max_page_size = 5
+	max_page_size = 25
 
 class EventViewSet(viewsets.ModelViewSet):
 
@@ -130,7 +130,7 @@ class DashboardView(generics.GenericAPIView):
 		# Set of 5 events for next 3 months
 		now = datetime.now()
 		events_list = EventSummarySerializer(queryset.all()[:10], many=True).data
-		events_by_month = {}
+		events_by_month = []
 
 		start_date = [now.year, now.month]
 		for i in range(3):
@@ -149,7 +149,7 @@ class DashboardView(generics.GenericAPIView):
 			month_end = datetime(end_date[0], end_date[1], 1) if now.month - i+1 <= 12 else now
 			month_str = month_start.strftime("%B")
 
-			events_by_month[f"type_{i+1}"] = {
+			events_by_month.append({
 				"type": month_str,
 				"data": EventSummarySerializer(
 					queryset.filter(
@@ -157,26 +157,27 @@ class DashboardView(generics.GenericAPIView):
 						date_time__lt=month_end
 					).order_by("-date_time")[:5],
 					many=True
-				).data
-			}
-			events_by_month[f"type_{i+1}"]["stats"] = {
-				"Stat 1": 80,
-				"Stat 2": 80,
-				"Stat 3": 80,
-				"Stat 4": 80,
-			}
+				).data,
+				"stats": {
+					"Stat 1": 80,
+					"Stat 2": 80,
+					"Stat 3": 80,
+					"Stat 4": 80,
+				}
+			})
+
 			start_date[1] = start_date[1] + 1
 
 
 		response_data["stats"] = {
-			"Stat 1": 80,
-			"Stat 2": 80,
-			"Stat 3": 80,
-			"Stat 4": 80,
+			"Stat 1": ["Lorem ipsum dolor", 80],
+			"Stat 2": ["Lorem ipsum dolor", 65],
+			"Stat 3": ["Lorem ipsum dolor", 12],
+			"Stat 4": ["Lorem ipsum dolor", 91],
 		} 
 		response_data["events"] = {
 			"all": events_list,
-			**events_by_month,
+			"byMonth": events_by_month,
 		}
 
 

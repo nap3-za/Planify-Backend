@@ -143,8 +143,7 @@ class EventSummarySerializer(serializers.ModelSerializer):
 	client_display 						= serializers.CharField(source="client.__str__", read_only=True)
 
 	tasks 								= TaskSerializerField(read_only=True)
-	date_time 							= DateTimeField(read_only=True)
-
+	date_time_display					= DateTimeField(read_only=True, source="date_time")
 
 	class Meta:
 		model = Event
@@ -160,7 +159,8 @@ class EventSummarySerializer(serializers.ModelSerializer):
 			"event_type_display",
 			"status_display",
 			"bill_status_display",
-
+			"date_time_display",
+			
 			"tasks",
 
 			# Relational
@@ -172,6 +172,7 @@ class EventSummarySerializer(serializers.ModelSerializer):
 			"event_type_display",
 			"status_display",
 			"bill_status_display",
+			"date_time_display"
 		)
 
 
